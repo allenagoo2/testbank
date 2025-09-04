@@ -1,0 +1,61 @@
+﻿@page "/addaccounts"
+@using BlazorApp1.Models
+@using BlazorApp1.Services
+@inject AccountService AccountService
+@attribute [Authorize]
+<h3>Add New Account</h3>
+ 
+<EditForm Model="@newAccount" OnValidSubmit="SaveAccount">
+    <DataAnnotationsValidator />
+    <div class="mb-3">
+        <label for="Name" class="form-label">Code</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="newAccount.Code" />
+        </div>
+        
+    </div>
+    <div class="mb-3">
+        <label for="Name" class="form-label">Description</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="newAccount.Description" />
+        </div>
+
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Save</button>
+       
+    </div>
+    
+</EditForm> 
+
+@code {
+
+
+    private List<Audit> audits;
+    private List<Account> accounts;
+    private Account newAccount=new Account();
+    Guid userId = Guid.Empty;
+    protected override async Task OnInitializedAsync()
+    {
+        userId = await AccountService.GetCurrentUserId();
+        accounts = AccountService.GetAccounts(userId);
+        audits = AccountService.GetLogAudit(userId);
+        
+    }
+
+    protected async Task SaveAccount()
+    {
+        AccountService.AddAccount(newAccount.Code, newAccount.Description, newAccount.OrderBy, userId);
+        accounts = AccountService.GetAccounts(userId);
+        newAccount = new Account();
+    }
+
+    
+
+    
+
+    int selectedAccountID;
+    string selectedAmount;
+
+   
+}

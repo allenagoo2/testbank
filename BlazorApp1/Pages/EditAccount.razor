@@ -1,0 +1,62 @@
+﻿@page "/editaccount/{accountId:int}"
+@using BlazorApp1.Models
+@using BlazorApp1.Services
+@inject AccountService AccountService
+@inject NavigationManager NavManager
+@attribute [Authorize]
+
+<h3>Edit Account</h3>
+
+<EditForm Model="@account" OnValidSubmit="SaveAccount">
+    <DataAnnotationsValidator />
+    <div class="mb-3">
+        <label for="Name" class="form-label">Code</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="account.Code" />
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="Name" class="form-label">Description</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="account.Description" />
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="Name" class="form-label">Order By</label>
+        <div class="col-md-4">
+            <InputNumber  class="form-control" @bind-Value="account.OrderBy" />
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="Name" class="form-label">Is Deleted</label>
+        <div class="col-md-4">
+            <InputCheckbox   @bind-Value="account.IsDeleted" />
+        </div>
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Save</button>
+
+    </div>
+
+</EditForm>
+@code {
+    [Parameter]
+    public int accountId { get; set; }
+    private Account account = new Account();
+    Guid userId = Guid.Empty;
+    protected override async Task OnInitializedAsync()
+    {
+        userId = await AccountService.GetCurrentUserId();
+        account = AccountService.GetAccount(userId, accountId);
+
+    }
+
+    protected async Task SaveAccount()
+    {
+        AccountService.SaveAccount(userId, accountId, account.Description, account.OrderBy, account.IsDeleted);
+        NavManager.NavigateTo("/");
+        
+
+        
+    }
+}

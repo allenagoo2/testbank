@@ -1,0 +1,97 @@
+﻿@page "/deposit"
+@using BlazorApp1.Models
+@using BlazorApp1.Services
+@inject AccountService AccountService
+@attribute [Authorize]
+ 
+
+<h3>Deposit</h3>
+Select Account
+<EditForm Model="@newAccount" OnValidSubmit="DepositAction">
+
+<select class="form-control"   @bind="@selectedAccountID">
+
+    <option value=""></option>
+    @foreach (var a in accounts)
+    {
+            <option value="@a.Id"> @a.Code @a.Amount.ToString("C") </option>
+    }
+    }
+    </select>
+    <div class="mb-3">
+        <label for="Name" class="form-label">Amount</label>
+        <div class="col-md-4">
+            <InputText class="form-control" @bind-Value="selectedAmount" />
+        </div>
+
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Save</button>
+
+    </div>
+</EditForm>
+ 
+ 
+
+@code {
+
+
+    private List<Audit> audits;
+    private List<Account> accounts;
+    private Account newAccount=new Account();
+    Guid userId = Guid.Empty;
+    protected override async Task OnInitializedAsync()
+    {
+        userId = await AccountService.GetCurrentUserId();
+        accounts = AccountService.GetAccounts(userId);
+        audits = AccountService.GetLogAudit(userId);
+        
+    }
+
+    protected async Task SaveAccount()
+    {
+        AccountService.AddAccount(newAccount.Code, newAccount.Description, newAccount.OrderBy, userId);
+        accounts = AccountService.GetAccounts(userId);
+        newAccount = new Account();
+    }
+
+    protected async Task DepositAction()
+    {
+        var originalAc = accounts.Where(x => x.Id == Convert.ToInt32(selectedAccountID)).FirstOrDefault(); ;
+        AccountService.Deposit(selectedAccountID, Convert.ToDecimal(selectedAmount), userId);
+        accounts = AccountService.GetAccounts(userId);
+        var selectedAc = accounts.Where(x => x.Id == Convert.ToInt32(selectedAccountID)).FirstOrDefault();
+        string formatedAmount = Convert.ToDecimal(selectedAmount).ToString("C");
+        AccountService.LogAudit(selectedAccountID, Convert.ToDecimal(selectedAmount), userId, "D", selectedAc.Code + " Deposited " + formatedAmount
+        + ". Before:"+ originalAc.Amount.ToString("C") + " After: " + selectedAc.Amount.ToString("C"));
+        
+        newAccount = new Account();
+        selectedAmount = "";
+
+        audits = AccountService.GetLogAudit(userId);
+
+    }
+
+    protected async Task Withdraw()
+    {
+        AccountService.Withdraw(selectedAccountID, Convert.ToDecimal(selectedAmount), userId);
+        accounts = AccountService.GetAccounts(userId);
+        var selectedAc = accounts.Where(x => x.Id == Convert.ToInt32(selectedAccountID)).FirstOrDefault();
+        string formatedAmount = Convert.ToDecimal(selectedAmount).ToString("C");
+        AccountService.LogAudit(selectedAccountID, Convert.ToDecimal(selectedAmount), userId, "W", selectedAc.Code + " Withrawn " + formatedAmount);
+
+        newAccount = new Account();
+        selectedAmount = "";
+
+        audits = AccountService.GetLogAudit(userId);
+
+        
+    }
+
+    
+
+    int selectedAccountID;
+    string selectedAmount;
+
+   
+}
