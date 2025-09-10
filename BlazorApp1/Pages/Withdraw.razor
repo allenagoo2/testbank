@@ -1,39 +1,49 @@
-﻿@page "/withraw"
+﻿@page "/withdraw"
 @using BlazorApp1.Models
 @using BlazorApp1.Services
 @inject AccountService AccountService
 @attribute [Authorize]
- 
- 
-<h3>Withraw</h3>
-Select Account
-<EditForm Model="@newAccount" OnValidSubmit="WithdrawAction">
-    <DataAnnotationsValidator />
-<select class="form-control" @bind="@selectedAccountID">
 
-    <option value=""></option>
-    @foreach (var a in accounts)
-    {
-            <option value="@a.Id"> @a.Code @a.Amount.ToString("C") </option>
-    }
-    }
 
-</select>
-    <div class="mb-3">
-        <label for="Name" class="form-label">Amount</label>
-        <div class="col-md-4">
-            <InputText class="form-control" @bind-Value="selectedAmount" />
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title text-danger mb-3">🏧 Withdraw Funds</h4>
+                    <p class="text-muted">Select an account and enter the amount to withdraw.</p>
+
+                    <EditForm Model="@newAccount" OnValidSubmit="WithdrawAction">
+                        <DataAnnotationsValidator />
+
+                        <div class="mb-3">
+                            <label for="accountSelect" class="form-label">Select Account</label>
+                            <select id="accountSelect" class="form-select" @bind="@selectedAccountID">
+                                <option value="">-- Choose an account --</option>
+                                @foreach (var a in accounts)
+                                {
+                                    <option value="@a.Id">@a.Code (@a.Amount.ToString("C"))</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="amountInput" class="form-label">Amount</label>
+                            <InputText id="amountInput" class="form-control" @bind-Value="selectedAmount" />
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-danger">
+                                💸 Withdraw
+                            </button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
         </div>
-
     </div>
-    <div class="form-group">
-        <button type="submit" class="btn btn-primary">Save</button>
+</div>
 
-    </div>
-</EditForm>
-
-
- 
 
 @code {
 

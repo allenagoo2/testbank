@@ -1,20 +1,27 @@
 ﻿@inherits LayoutComponentBase
 
-<PageTitle>BlazorApp1</PageTitle>
+<PageTitle></PageTitle>
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-
-    <main>
-        <div class="top-row px-4 auth">
-            <LoginDisplay />
-           
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 bg-light border-end vh-100 p-3">
+            <NavMenu />
         </div>
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="d-flex justify-content-between align-items-center px-4 py-3 border-bottom bg-white shadow-sm">
+                <LoginDisplay />
+            </div>
+
+            <div class="px-4 py-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        @Body
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
